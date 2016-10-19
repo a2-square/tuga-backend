@@ -1,5 +1,3 @@
-var passport = require('passport');
-var authenticateLogin = require('../config/auth-login/authenticate_login.js');
 require('../config/db/models/userModel.js');
 var User = mongoose.model("userModel");
 
