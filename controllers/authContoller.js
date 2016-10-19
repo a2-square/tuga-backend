@@ -21,7 +21,7 @@ exports.simpleSignup = function(req, res) {
         } else {
             res.json({
                 authentication: false,
-                message: "Sorry! This user name is already registered"
+                message: "Sorry! This email address is already registered"
             });
         }
     });
