@@ -6,8 +6,7 @@ exports.successResponse = function(req, res, next) {
         res.json({
             authentication: true,
             token: req.user._id,
-            message: 'successfully login',
-            abstract: req.user
+            message: 'successfully login'
         });
 }
 
