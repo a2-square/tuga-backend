@@ -1,3 +1,5 @@
+var passport = require('passport');
+var authenticateLogin = require('../config/passport/passport_login.js');
 require('../config/db/models/userModel.js');
 var User = mongoose.model("userModel");
 
@@ -6,7 +8,8 @@ exports.successResponse = function(req, res, next) {
         res.json({
             authentication: true,
             token: req.user._id,
-            message: 'successfully login'
+            message: 'successfully login',
+            abstract: req.user
         });
 }
 

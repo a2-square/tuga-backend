@@ -1,18 +1,39 @@
 var schema = mongoose.Schema;
+var bcrypt   = require('bcrypt-nodejs');
 
-var userSchema = new schema({
-    name: {type: String},
-    firstName: {type: String},
-    lastName: {type: String},
-    username: {type: String},
-    password: {type: String},
-    facebook: {type: Object},
-    linkedin: {type: Object},
-    email: {type:String, unique: true }
+// define the schema for our user model
+var userSchema = mongoose.Schema({
+
+    local: {
+        email 			: {type:String},
+        password 		: {type: String},
+        firstName		: {type: String},
+        lastName		: {type: String},
+    },
+    facebook: {
+        id				: {type: String,},
+        accessToken		: {type: String},
+        email			: {type: String},
+        firstName		: {type: String},
+        lastName		: {type: String},
+        gender			: {type: String},
+        profile_picture	: {type: String},
+        linkedAt		: {type: Date}
+    },
+    linkedin: {
+        id				: {type: String,},
+        accessToken		: {type: String},
+        email			: {type: String},
+        firstName		: {type: String},
+        lastName		: {type: String},
+        gender			: {type: String},
+        profile_picture	: {type: String},
+        linkedAt		: {type: Date}
+    }
 });
 
 userSchema.methods.validPassword = function( pwd ) {
-    return ( this.password === pwd );
+    return ( this.local.password == pwd );
 };
 
 exports.userModel = mongoose.model("userModel", userSchema);

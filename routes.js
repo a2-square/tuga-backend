@@ -1,8 +1,12 @@
 var path = require('path');
 var passport = require('passport');
-var authenticateLogin = require('./config/auth-login/authenticate_login.js');
-var loginResponse = require('./controllers/login_controllers');
+var authenticateLogin = require('./config/passport/passport_login.js');
 var authContoller = require('./controllers/authContoller');
+require('./config/db/models/userModel.js');
+var User = mongoose.model("userModel");
+var jwt = require('jsonwebtoken');
+var secretKey = 'tugaPassportApplicationTest';
+var tokenTime = 60 * 60;
 
 module.exports = function(app, router) {
     app.route('/').get(function(req, res) {
@@ -10,6 +14,39 @@ module.exports = function(app, router) {
     });
 
     app.use('/api/', router);
+
+/////////////////////Route to check loggedIn and to verify JWT///////////////////////////////////////
+
+    router.use(function(req, res, next) {
+        // check header or url parameters or post parameters for token
+        var token = req.body.access_token || req.query.access_token || req.headers['access_token'];
+        // decode token
+        if (token) {
+            // verifies secret and checks exp
+            jwt.verify(token, secretKey, function(err, decoded) {
+                if (err) {
+                    return res.json({ authentication: false, message: 'Failed to authenticate token.' });
+                } else {
+                    // if everything is good, save to request for use in other routes
+                    req.decoded = decoded;
+                    return next();
+                }
+            });
+        } else {
+            // if there is no token
+            return res.send({
+                authentication: false,
+                message: 'Please login to see this'
+            });
+
+        }
+    });
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+////////////////////Serialized and Deserialized logged In user/////////////////////////////////////////
+
     passport.serializeUser(function(user, done) {
         console.log('serializeUser: ' + user._id);
         done(null, user._id);
@@ -24,6 +61,13 @@ module.exports = function(app, router) {
         });
     });
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+/////////////////Route for simple Sigup and Passport-local-jwt LogIn//////////////////////////////////
+
     app.post('/signup', authContoller.simpleSignup);
 
     app.post('/login', function(req, res, next) {
@@ -33,26 +77,41 @@ module.exports = function(app, router) {
             }
             // Generate a JSON response reflecting authentication status
             if (!user) {
-                return res.send(401, { authentication: false, message: 'authentication failed', data: user});
+                return res.send(401, { authentication: false, message: 'authentication failed'});
             }
-            req.logIn(user, function(err) {
-                if (err) {
-                    return next(err);
-                }
-                return res.send({ authentication: true, message: 'Successfully! Login' });
+            req.token = jwt.sign({
+                id: user.id,
+            }, secretKey, {
+                expiresIn: tokenTime
             });
+            res.send(200, { data: user, access_token: req.token, authentication: true, message: 'Successfully Login!'});
+            return;
         })(req, res, next);
     });
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+//////////////////////////////Under Development Routes/////////////////////////////////////////////////
     app.get('/auth/facebook',
-        passport.authenticate('facebook'),
+        passport.authenticate('facebook', {scope: ['email']}),
         loginResponse.successResponse, loginResponse.failedResponse);
 
     app.get('/auth/linkedin',
-        passport.authenticate('linkedin'),
+        passport.authenticate('linkedin', { scope: ['r_basicprofile', 'r_emailaddress'] }),
         loginResponse.successResponse, loginResponse.failedResponse);
-    
 
-    app.get('/logout', authContoller.logout);
+///////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+////////////////////////////////Routes Which will only be called after login/////////////////////////////
+    router.post('/authenticateClientRoute', authContoller.verifyLogin);    
+    router.get('/logout', authContoller.logout)
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }

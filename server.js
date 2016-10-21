@@ -2,22 +2,27 @@ var express = require("express");
 var app = express();                     //instantiates Express
 var http = require("http");
 var server = require("http").createServer(app);
-var session = require("express-session");
 var bodyParser = require("body-parser");   //bodyParser is in fact the composition of three middlewares like json, urlencoded and multipart
 var chalk = require('chalk');
 var morgan = require('morgan');
 var errorhandler = require('errorhandler');
 var notifier = require('node-notifier');
 var passport = require('passport');
+var secretKey = 'tugaPassportApplicationTest';
+var expressJwt = require('express-jwt');
 // var cors = require('cors');
 
 global.mongoose = require("mongoose");
 var connectDB = require('./config/db/config_connect.js');
 
+var authenticate = expressJwt({
+  secret: secretKey
+});
+
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, access_token');
 
     if ('OPTIONS' == req.method) {
       res.sendStatus(200);
@@ -32,13 +37,8 @@ app.use(express.static(__dirname + "/public"));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 // app.use(cors());
-app.use(session({
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: true
-}));
+
 app.use(passport.initialize());
-app.use(passport.session());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
