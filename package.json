@@ -16,6 +16,7 @@
     "errorhandler": "^1.4.3",
     "express": "^4.14.0",
     "express-jwt": "^5.1.0",
+    "express-session": "^1.14.1",
     "fs": "0.0.1-security",
     "gulp": "^3.9.1",
     "gulp-nodemon": "^2.2.1",

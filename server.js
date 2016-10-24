@@ -7,6 +7,7 @@ var chalk = require('chalk');
 var morgan = require('morgan');
 var errorhandler = require('errorhandler');
 var notifier = require('node-notifier');
+var session = require("express-session");
 var passport = require('passport');
 var secretKey = 'tugaPassportApplicationTest';
 var expressJwt = require('express-jwt');
@@ -22,7 +23,7 @@ var authenticate = expressJwt({
 var allowCrossDomain = function(req, res, next) {
     res.header('Access-Control-Allow-Origin', '*');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With, access_token');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Content-Length, X-Requested-With, access_token');
 
     if ('OPTIONS' == req.method) {
       res.sendStatus(200);
@@ -33,6 +34,11 @@ var allowCrossDomain = function(req, res, next) {
 };
 
 //configure middleware components.
+app.use(session({
+    secret: secretKey,
+    resave: false,
+    saveUninitialized: true
+}));
 app.use(express.static(__dirname + "/public"));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');

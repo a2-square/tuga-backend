@@ -15,7 +15,7 @@ module.exports = function(app, router) {
 
     app.use('/api/', router);
 
-/////////////////////Route to check loggedIn and to verify JWT///////////////////////////////////////
+    /////////////////////Route to check loggedIn and to verify JWT///////////////////////////////////////
 
     router.use(function(req, res, next) {
         // check header or url parameters or post parameters for token
@@ -36,16 +36,16 @@ module.exports = function(app, router) {
             // if there is no token
             return res.send({
                 authentication: false,
-                message: 'Please login to see this'
+                message: 'Please login'
             });
 
         }
     });
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-////////////////////Serialized and Deserialized logged In user/////////////////////////////////////////
+    ////////////////////Serialized and Deserialized logged In user/////////////////////////////////////////
 
     passport.serializeUser(function(user, done) {
         console.log('serializeUser: ' + user._id);
@@ -61,12 +61,12 @@ module.exports = function(app, router) {
         });
     });
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
-/////////////////Route for simple Sigup and Passport-local-jwt LogIn//////////////////////////////////
+    /////////////////Route for simple Sigup and Passport-local-jwt LogIn//////////////////////////////////
 
     app.post('/signup', authContoller.simpleSignup);
 
@@ -77,41 +77,43 @@ module.exports = function(app, router) {
             }
             // Generate a JSON response reflecting authentication status
             if (!user) {
-                return res.send(401, { authentication: false, message: 'authentication failed'});
+                return res.send(401, { authentication: false, message: 'authentication failed' });
             }
             req.token = jwt.sign({
                 id: user.id,
             }, secretKey, {
                 expiresIn: tokenTime
             });
-            res.send(200, { data: user, access_token: req.token, authentication: true, message: 'Successfully Login!'});
+            res.send(200, { data: user, access_token: req.token, authentication: true, message: 'Successfully Login!' });
             return;
         })(req, res, next);
     });
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
-//////////////////////////////Under Development Routes/////////////////////////////////////////////////
+    //////////////////////////////login and Signup Using Socail media Account//////////////////////////////////
+   
     app.get('/auth/facebook',
-        passport.authenticate('facebook', {scope: ['email']}),
-        loginResponse.successResponse, loginResponse.failedResponse);
+        passport.authenticate('facebook', { session: false, scope: ['email'] }), authContoller.socailLogin)
 
     app.get('/auth/linkedin',
-        passport.authenticate('linkedin', { scope: ['r_basicprofile', 'r_emailaddress'] }),
-        loginResponse.successResponse, loginResponse.failedResponse);
+        passport.authenticate('linkedin', { session: false, scope: ['r_basicprofile', 'r_emailaddress'] }),
+        authContoller.socailLogin
 
-///////////////////////////////////////////////////////////////////////////////////////////////////////
+    );
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 
 
-////////////////////////////////Routes Which will only be called after login/////////////////////////////
-    router.post('/authenticateClientRoute', authContoller.verifyLogin);    
+    ////////////////////////////////Routes Which will only be called after login/////////////////////////////
+    router.post('/authenticateClientRoute', authContoller.verifyLogin);
     router.get('/logout', authContoller.logout)
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 }
