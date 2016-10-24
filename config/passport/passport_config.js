@@ -1,12 +1,12 @@
 module.exports = {
   facebook: {
-    clientID: 'XXXXXXXXXXXXXXXXXXXX',
-    clientSecret: 'XXXXXXXXXXXXXXXXXXXX',
+    clientID: 'XXXXXXXXXXXXXX',
+    clientSecret: 'XXXXXXXXXXXXXX',
     callbackURL: 'http://localhost:7000/auth/facebook'
   },
   linkedin: {
-    consumerKey: 'XXXXXXXXXXXXXXXXXXXX',
-    consumerSecret: 'XXXXXXXXXXXXXXXXXXXX',
+    consumerKey: 'XXXXXXXXXXXXXX',
+    consumerSecret: 'XXXXXXXXXXXXXX',
     callbackURL: "http://localhost:7000/auth/linkedin"
   },
 
