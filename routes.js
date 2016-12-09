@@ -1,7 +1,6 @@
 var path = require('path');
 var passport = require('passport');
 var authenticateLogin = require('./config/passport/passport_login.js');
-var loginResponse = require('./controllers/login_controllers');
 var authContoller = require('./controllers/authContoller');
 require('./config/db/models/userModel.js');
 var User = mongoose.model("userModel");
